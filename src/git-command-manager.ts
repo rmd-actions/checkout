@@ -37,7 +37,6 @@ export interface IGitCommandManager {
     options: {
       filter?: string
       fetchDepth?: number
-      fetchTags?: boolean
       showProgress?: boolean
     }
   ): Promise<void>
@@ -280,14 +279,13 @@ class GitCommandManager {
     options: {
       filter?: string
       fetchDepth?: number
-      fetchTags?: boolean
       showProgress?: boolean
     }
   ): Promise<void> {
     const args = ['-c', 'protocol.version=2', 'fetch']
-    if (!refSpec.some(x => x === refHelper.tagsRefSpec) && !options.fetchTags) {
-      args.push('--no-tags')
-    }
+    // Always use --no-tags for explicit control over tag fetching
+    // Tags are fetched explicitly via refspec when needed
+    args.push('--no-tags')
 
     args.push('--prune', '--no-recurse-submodules')
     if (options.showProgress) {
@@ -730,7 +728,19 @@ class GitCommandManager {
       }
     }
     // Set the user agent
-    const gitHttpUserAgent = `git/${this.gitVersion} (github-actions-checkout)`
+    let gitHttpUserAgent = `git/${this.gitVersion} (github-actions-checkout)`
+
+    // Append orchestration ID if set
+    const orchId = process.env['ACTIONS_ORCHESTRATION_ID']
+    if (orchId) {
+      // Sanitize the orchestration ID to ensure it contains only valid characters
+      // Valid characters: 0-9, a-z, _, -, .
+      const sanitizedId = orchId.replace(/[^a-z0-9_.-]/gi, '_')
+      if (sanitizedId) {
+        gitHttpUserAgent = `${gitHttpUserAgent} actions_orchestration_id/${sanitizedId}`
+      }
+    }
+
     core.debug(`Set git useragent to: ${gitHttpUserAgent}`)
     this.gitEnv['GIT_HTTP_USER_AGENT'] = gitHttpUserAgent
   }
