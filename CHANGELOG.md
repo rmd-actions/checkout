@@ -1,5 +1,15 @@
 # Changelog
 
+## v7.0.1
+* Skip running unsafe pr check if input is default by @aiqiaoy in https://github.com/actions/checkout/pull/2518
+* Trim only ascii whitespace for branch by @aiqiaoy in https://github.com/actions/checkout/pull/2521
+* Escape values passed to --unset by @aiqiaoy in https://github.com/actions/checkout/pull/2530
+* Various dependency updates
+
+## v7.0.0
+* Block checking out fork PR for pull_request_target and workflow_run by @aiqiaoy in https://github.com/actions/checkout/pull/2454
+* Various dependency updates 
+
 ## v6.0.3
 * Fix checkout init for SHA-256 repositories by @yaananth in https://github.com/actions/checkout/pull/2439
 * fix: expand merge commit SHA regex and add SHA-256 test cases by @yaananth in https://github.com/actions/checkout/pull/2414
